@@ -1,0 +1,41 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<BorlandProject>
+	<Transactions>
+    <Transaction>2007/08/05 08:14:20.171.cpp,C:\Documents and Settings\HP_Administrator\My Documents\RAD Studio\Projects\File1.cpp=C:\Documents and Settings\HP_Administrator\Desktop\Programming\ZUtility\ZPlayer_dll\src\zplayerdll.cpp</Transaction>
+    <Transaction>2007/08/05 08:14:44.984.cbproj,C:\Documents and Settings\HP_Administrator\My Documents\RAD Studio\Projects\Project1.cbproj=C:\Documents and Settings\HP_Administrator\Desktop\Programming\ZUtility\ZPlayer_dll\projects\BCB2007\ZPlayerDll.cbproj</Transaction>
+    <Transaction>2007/08/05 08:20:42.578.cpp,C:\Documents and Settings\HP_Administrator\Desktop\Programming\ZUtility\ZPlayer_dll\projects\BCB2007\Unit1.cpp=C:\Documents and Settings\HP_Administrator\Desktop\Programming\ZUtility\ZPlayer_dll\src\zp_mainform.cpp</Transaction>
+    <Transaction>2007/08/05 08:20:42.578.h,C:\Documents and Settings\HP_Administrator\Desktop\Programming\ZUtility\ZPlayer_dll\projects\BCB2007\Unit1.h=C:\Documents and Settings\HP_Administrator\Desktop\Programming\ZUtility\ZPlayer_dll\src\zp_mainform.h</Transaction>
+    <Transaction>2007/08/05 08:20:42.578.dfm,C:\Documents and Settings\HP_Administrator\Desktop\Programming\ZUtility\ZPlayer_dll\projects\BCB2007\Unit1.dfm=C:\Documents and Settings\HP_Administrator\Desktop\Programming\ZUtility\ZPlayer_dll\src\zp_mainform.dfm</Transaction>
+    <Transaction>2007/08/05 08:54:21.203.h,C:\Documents and Settings\HP_Administrator\Desktop\Programming\ZUtility\dll_interfaces\ZPlayerDll.h=</Transaction>
+    <Transaction>2007/08/19 22:32:25.823.cpp,D:\C++\ZUtility\ZPlayer_dll\projects\BCB2007\Unit1.cpp=D:\C++\ZUtility\ZPlayer_dll\src\zp_aboutform.cpp</Transaction>
+    <Transaction>2007/08/19 22:32:25.823.h,D:\C++\ZUtility\ZPlayer_dll\projects\BCB2007\Unit1.h=D:\C++\ZUtility\ZPlayer_dll\src\zp_aboutform.h</Transaction>
+    <Transaction>2007/08/19 22:32:25.823.dfm,D:\C++\ZUtility\ZPlayer_dll\projects\BCB2007\Unit1.dfm=D:\C++\ZUtility\ZPlayer_dll\src\zp_aboutform.dfm</Transaction>
+    <Transaction>2007/08/19 22:33:00.615.cpp,D:\C++\ZUtility\ZPlayer_dll\src\zp_aboutform.cpp=</Transaction>
+    <Transaction>2007/08/19 22:33:00.616.dfm,D:\C++\ZUtility\ZPlayer_dll\src\zp_aboutform.dfm=</Transaction>
+    <Transaction>2007/08/19 22:34:03.478.cpp,D:\C++\ZUtility\ZPlayer_dll\projects\BCB2007\Unit1.cpp=D:\C++\ZUtility\ZPlayer_dll\src\zp_aboutform.cpp</Transaction>
+    <Transaction>2007/08/19 22:34:03.478.h,D:\C++\ZUtility\ZPlayer_dll\projects\BCB2007\Unit1.h=D:\C++\ZUtility\ZPlayer_dll\src\zp_aboutform.h</Transaction>
+    <Transaction>2007/08/19 22:34:16.377.cpp,D:\C++\ZUtility\ZPlayer_dll\src\zp_aboutform.cpp=</Transaction>
+    <Transaction>2007/08/19 22:34:50.489.cpp,D:\C++\ZUtility\ZPlayer_dll\projects\BCB2007\Unit2.cpp=D:\C++\ZUtility\ZPlayer_dll\src\zp_aboutform.cpp</Transaction>
+    <Transaction>2007/08/19 22:34:50.489.h,D:\C++\ZUtility\ZPlayer_dll\projects\BCB2007\Unit2.h=D:\C++\ZUtility\ZPlayer_dll\src\zp_aboutform.h</Transaction>
+    <Transaction>2007/08/19 22:34:50.489.dfm,D:\C++\ZUtility\ZPlayer_dll\projects\BCB2007\Unit2.dfm=D:\C++\ZUtility\ZPlayer_dll\src\zp_aboutform.dfm</Transaction>
+    <Transaction>2007/08/19 22:35:14.244.cpp,D:\C++\ZUtility\ZPlayer_dll\src\zp_aboutform.cpp=</Transaction>
+    <Transaction>2007/08/19 22:35:14.245.dfm,D:\C++\ZUtility\ZPlayer_dll\src\zp_aboutform.dfm=</Transaction>
+    <Transaction>2007/08/19 22:35:53.173.cpp,D:\C++\ZUtility\ZPlayer_dll\projects\BCB2007\Unit2.cpp=D:\C++\ZUtility\ZPlayer_dll\src\zp_optionform.cpp</Transaction>
+    <Transaction>2007/08/19 22:35:53.173.h,D:\C++\ZUtility\ZPlayer_dll\projects\BCB2007\Unit2.h=D:\C++\ZUtility\ZPlayer_dll\src\zp_optionform.h</Transaction>
+    <Transaction>2007/08/19 22:35:53.173.dfm,D:\C++\ZUtility\ZPlayer_dll\projects\BCB2007\Unit2.dfm=D:\C++\ZUtility\ZPlayer_dll\src\zp_optionform.dfm</Transaction>
+    <Transaction>2007/08/26 04:23:26.331.cpp,D:\C++\ZUtility\ZPlayer_dll\projects\BCB2007\ABOUT.cpp=D:\C++\ZUtility\ZPlayer_dll\src\zp_aboutform.cpp</Transaction>
+    <Transaction>2007/08/26 04:23:26.331.h,D:\C++\ZUtility\ZPlayer_dll\projects\BCB2007\ABOUT.h=D:\C++\ZUtility\ZPlayer_dll\src\zp_aboutform.h</Transaction>
+    <Transaction>2007/08/26 04:23:26.331.dfm,D:\C++\ZUtility\ZPlayer_dll\projects\BCB2007\ABOUT.dfm=D:\C++\ZUtility\ZPlayer_dll\src\zp_aboutform.dfm</Transaction>
+    <Transaction>2007/08/26 04:24:06.907.cpp,D:\C++\ZUtility\ZPlayer_dll\src\zp_aboutform.cpp=</Transaction>
+    <Transaction>2007/08/26 04:24:06.909.dfm,D:\C++\ZUtility\ZPlayer_dll\src\zp_aboutform.dfm=</Transaction>
+    <Transaction>2007/08/30 02:00:00.995.cpp,D:\C++\ZUtility\ZPlayer_dll\projects\BCB2007\Unit1.cpp=D:\C++\ZUtility\ZPlayer_dll\src\zp_playlist.cpp</Transaction>
+    <Transaction>2007/08/30 02:00:00.995.h,D:\C++\ZUtility\ZPlayer_dll\projects\BCB2007\Unit1.h=D:\C++\ZUtility\ZPlayer_dll\src\zp_playlist.h</Transaction>
+    <Transaction>2007/08/30 04:18:39.726.cpp,D:\C++\ZUtility\ZPlayer_dll\src\zp_playlist.cpp=</Transaction>
+    <Transaction>2007/09/01 05:20:36.292.CPP,c:\program files\codegear\rad studio\5.0\ObjRepos\Cpp\okcancl1.CPP=</Transaction>
+    <Transaction>2007/09/01 05:20:36.293.dfm,c:\program files\codegear\rad studio\5.0\ObjRepos\Cpp\okcancl1.dfm=</Transaction>
+    <Transaction>2007/09/23 16:33:23.827.cpp,C:\Users\Owner\Documents\ZUtility\ZPlayer_dll\src\zp_mainform.cpp=</Transaction>
+    <Transaction>2007/09/23 16:33:23.828.dfm,C:\Users\Owner\Documents\ZUtility\ZPlayer_dll\src\zp_mainform.dfm=</Transaction>
+    <Transaction>2007/09/23 16:33:23.830.cpp,C:\Users\Owner\Documents\ZUtility\ZPlayer_dll\src\zp_optionform.cpp=</Transaction>
+    <Transaction>2007/09/23 16:33:23.831.dfm,C:\Users\Owner\Documents\ZUtility\ZPlayer_dll\src\zp_optionform.dfm=</Transaction>
+  </Transactions>
+</BorlandProject>

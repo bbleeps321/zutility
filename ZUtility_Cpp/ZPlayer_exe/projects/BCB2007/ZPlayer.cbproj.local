@@ -1,0 +1,11 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<BorlandProject>
+	<Transactions>
+    <Transaction>2007/09/23 16:32:52.279.cpp,C:\Users\Owner\Documents\RAD Studio\Projects\Unit1.cpp=C:\Users\Owner\Documents\ZUtility\ZPlayer_exe\src\Unit1.cpp</Transaction>
+    <Transaction>2007/09/23 16:32:52.279.h,C:\Users\Owner\Documents\RAD Studio\Projects\Unit1.h=C:\Users\Owner\Documents\ZUtility\ZPlayer_exe\src\Unit1.h</Transaction>
+    <Transaction>2007/09/23 16:32:52.279.dfm,C:\Users\Owner\Documents\RAD Studio\Projects\Unit1.dfm=C:\Users\Owner\Documents\ZUtility\ZPlayer_exe\src\Unit1.dfm</Transaction>
+    <Transaction>2007/09/23 16:33:03.711.cbproj,C:\Users\Owner\Documents\RAD Studio\Projects\Project1.cbproj=C:\Users\Owner\Documents\ZUtility\ZPlayer_exe\projects\BCB2007\ZPlayer.cbproj</Transaction>
+    <Transaction>2007/09/23 16:34:18.541.cpp,C:\Users\Owner\Documents\ZUtility\ZPlayer_exe\src\Unit1.cpp=</Transaction>
+    <Transaction>2007/09/23 16:34:18.542.dfm,C:\Users\Owner\Documents\ZUtility\ZPlayer_exe\src\Unit1.dfm=</Transaction>
+  </Transactions>
+</BorlandProject>

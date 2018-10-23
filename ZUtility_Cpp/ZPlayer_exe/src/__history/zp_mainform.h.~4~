@@ -1,0 +1,331 @@
+//---------------------------------------------------------------------------
+
+#ifndef zp_mainformH
+#define zp_mainformH
+//---------------------------------------------------------------------------
+#include <Classes.hpp>
+#include <Controls.hpp>
+#include <StdCtrls.hpp>
+#include <Forms.hpp>
+#include <CheckLst.hpp>
+#include <Menus.hpp>
+#include <MPlayer.hpp>
+#include <Dialogs.hpp>
+#include <ExtCtrls.hpp>
+#include <ComCtrls.hpp>
+#include <ActnList.hpp>
+#include <vector>
+#include <string>
+#include <iostream>
+#include <fstream>
+
+#include "zp_optionform.h"
+
+/// Plays media files and provides a simple GUI for controlling them.
+/// NOTE: All path/file parameters for the methods should be complete paths.
+/// TODO: Make optionform's labels change color correctly.
+/// TODO: Fix tab page color problem.
+/// TODO: Implement reading and writing playlists (.zpl).
+/// TODO: Change the order of the buttons to match the media control hotkeys.
+/// TODO: Replace AlreadyLoaded with XVector::Contains.
+//---------------------------------------------------------------------------
+class TZPlayerForm : public TForm
+{
+__published:	// IDE-managed Components
+	TMediaPlayer *MediaControl;
+	TLabel *PlayingLabel;
+	TMainMenu *MainFormMenu;
+	TMenuItem *File1;
+	TMenuItem *Close1;
+	TMenuItem *Options1;
+	TMenuItem *About1;
+	TListBox *LibraryList;
+	TPopupMenu *NowPlayingPopup;
+	TMenuItem *Add1;
+	TMenuItem *RemoveSelected1;
+	TMenuItem *CropSelected1;
+	TMenuItem *NewPlayingList1;
+	TMenuItem *SaveNowPlayingList1;
+	TCheckListBox *PlayingList;
+	TLabel *PlayingListLabel;
+	TLabel *LibraryLabel;
+	TOpenDialog *OpenDialog1;
+	TSaveDialog *SaveDialog1;
+	TTimer *PlayTimer;
+	TPopupMenu *LibraryPopup;
+	TMenuItem *AddSelected1;
+	TMenuItem *Load1;
+	TTrackBar *SongTrackBar;
+	TButton *CropButton;
+	TButton *ClearButton;
+	TButton *DeleteButton;
+	TLabeledEdit *SearchIn;
+	TMenuItem *AddSelected2;
+	TLabel *TimeDisplay;
+	TMenuItem *DeleteSelected1;
+	TMenuItem *AddFavoriteLibrary;
+	TMenuItem *AddFavoritePlayList;
+	TMenuItem *InvertSelected1;
+	TActionList *ActionList;
+	TAction *PlayPauseAction;
+	TAction *StopAction;
+	TAction *NextAction;
+	TAction *PrevAction;
+	TAction *QuickPlayAction1;
+	TAction *QuickPlayAction2;
+	TAction *QuickPlayAction3;
+	TAction *QuickPlayAction4;
+	TAction *QuickPlayAction5;
+	TAction *QuickPlayAction6;
+	TAction *QuickPlayAction7;
+	TAction *QuickPlayAction8;
+	TAction *QuickPlayAction9;
+	TAction *QuickPlayAction10;
+	TMenuItem *PlaySelected1;
+	TMenuItem *Remove1;
+	TMenuItem *Move1;
+	TMenuItem *Up1;
+	TMenuItem *Down1;
+	TMenuItem *ToTop1;
+	TMenuItem *ToBottom1;
+	TAction *LoopAction;
+	TAction *ShuffleAction;
+	TAction *HeadstartAction;
+	TAction *HandicapAction;
+	TAction *ReverseAction;
+	TAction *AutoPlayAction;
+	TAction *OnTopAction;
+
+	/// Called when the close action command is invoked.
+	/// Closes the ZPlayer form.
+	void __fastcall Close1Click(TObject *Sender);
+
+	/// Called when the open action command is invoked.
+	/// Loads the selected song(s) into the library list.
+	void __fastcall File1Click(TObject *Sender);
+
+	/// Called when an item in the library list is double clicked.
+	/// Adds the selected item to the now playing list and plays it
+	/// if it is the first to be added.
+	void __fastcall LibraryListDblClick(TObject *Sender);
+
+	/// Called when the timer event is scheduled.
+	/// Checks if the song is over and goes to the next one if it is.
+	void __fastcall PlayTimerTimer(TObject *Sender);
+
+	/// Called when the options action command is invoked.
+	/// Shows the options control.
+	void __fastcall Options1Click(TObject *Sender);
+
+	/// Called when the form is created.
+	/// Initializes some member variables for controls.
+	void __fastcall FormCreate(TObject *Sender);
+
+	/// Called when an item in the now playing list is double clicked.
+	/// Plays the song that was double clicked on.
+	void __fastcall PlayingListDblClick(TObject *Sender);
+
+	/// Called when the media control component's button is clicked.
+	/// Handles changes that need to be made. Different depending on the
+	/// button that was clicked.
+	void __fastcall MediaControlClick(TObject *Sender, TMPBtnType Button,
+		  bool &DoDefault);
+
+	/// Called when the remove selected action event is invoked.
+	/// Removes the selected songs from the playlist.
+	void __fastcall RemoveSelected1Click(TObject *Sender);
+
+	/// Called when the clear action event is invoked.
+	/// Removes all the songs from the playlist.
+	void __fastcall ClearButtonClick(TObject *Sender);
+
+	/// Called when the text in the search box is changed.
+	/// Searches the songs in the library and changes the contents of the
+	/// display based on their relationship to the delimiter.
+	void __fastcall SearchInChange(TObject *Sender);
+
+	/// Removes all the songs from the playlist except the selected ones and plays
+	/// the new song at the top of the list.
+	void __fastcall CropSelected1Click(TObject *Sender);
+
+	/// Called when the add to new list action event is invoked.
+	/// Adds the selected songs in the library to a new, empty play list.
+	void __fastcall AddSelected2Click(TObject *Sender);
+
+	/// Called when the add song action event is invoked.
+	/// Loads the selected song(s) into the library and the now playing list.
+	void __fastcall Add1Click(TObject *Sender);
+
+	/// Called when the delete from library action event is invoked.
+	/// Removes the selected song(s) from the library.
+	void __fastcall DeleteSelected1Click(TObject *Sender);
+
+	/// Adds the selected songs in the library/playlist to the favorites
+	/// list. Library/playlist depends on the sender.
+	void __fastcall AddFavoriteClick(TObject *Sender);
+
+	/// Called when this form is destroyed.
+	/// Updates the favorites file.
+	void __fastcall FormDestroy(TObject *Sender);
+
+	/// Inverts the checked state of the selected items in the playlist.
+	void __fastcall InvertSelected1Click(TObject *Sender);
+
+	/// Action for pausing/resuming the current song.
+	void __fastcall PlayPauseActionExecute(TObject *Sender);
+
+	/// Action for stoping the current song.
+	void __fastcall StopActionExecute(TObject *Sender);
+
+	/// Action for playing the next song.
+	void __fastcall NextActionExecute(TObject *Sender);
+
+	/// Action for playing the previous song.
+	void __fastcall PrevActionExecute(TObject *Sender);
+
+	/// Handles the quickplaying of the top ten favorites.
+	/// Adds the corresponding favorite to the playlist and plays it
+	/// if the autoplay option is selected.
+	void __fastcall QuickPlayActionExecute(TObject *Sender);
+
+	/// Displays the entire song name of the item under the mouse cursor.
+	/// Does nothing if there is no item under the mouse cursor.
+	void __fastcall ListMouseMove(TObject *Sender, TShiftState Shift, int X,
+		  int Y);
+
+	/// Moves the selected items in the playlist up one index.
+	void __fastcall MoveUp1Click(TObject *Sender);
+
+	/// Moves the selected items in the playlist down one index.
+	void __fastcall MoveDown1Click(TObject *Sender);
+
+	/// Moves the selected items in the playlist to the top of the list.
+	void __fastcall MoveToTop1Click(TObject *Sender);
+
+	/// Moves the selected items in the playlist to the bottom of the list.
+	void __fastcall MoveToBottom1Click(TObject *Sender);
+
+	/// Toggles the loop enabled state in the options.
+	void __fastcall LoopActionExecute(TObject *Sender);
+
+	/// Toggles the shuffle enabled state in the options.
+	void __fastcall ShuffleActionExecute(TObject *Sender);
+
+	/// Toggles the headstart enabled state in the options.
+	void __fastcall HeadstartActionExecute(TObject *Sender);
+
+	/// Toggles the handicap enabled state in the options.
+	void __fastcall HandicapActionExecute(TObject *Sender);
+
+	/// Toggles the reverse enabled state in the options.
+	void __fastcall ReverseActionExecute(TObject *Sender);
+
+    /// Selected the autoplay type next to this one (increments the index)
+	/// in the options.
+	void __fastcall AutoPlayActionExecute(TObject *Sender);
+
+	/// Toggles the always on top enabled state in the options.
+	void __fastcall OnTopActionExecute(TObject *Sender);
+	void __fastcall FormClose(TObject *Sender, TCloseAction &Action);
+
+private:	// User declarations
+	// TODO: ***Convert vector<String> to TStrings***
+	int 							m_currentSong;					///< Index of currently playing/loaded song in the playlist.
+																	///< An index of -1 means no song is currently loaded.
+	bool									m_playing;				///< If a song is currently playing.
+	bool									m_loaded;				///< If a song is currently loaded and ready for playing.
+	std::vector<String>						m_allFiles;				///< List of all songs loaded in the library.
+	std::vector<String> 					m_libraryFiles;			///< List of paths for all song displayed in the library list.
+	std::vector<String>						m_playListFiles;        ///< List of string mapping index of song in the now playing list to a song.
+	std::vector<String>						m_favList;				///< List of favorite songs.
+	TOptionForm							   *m_optionsControl;		///< Options control.
+
+	/// Returns the index of the next song in the list to play.
+	/// Returns the first song in the list if the current song is the last one.
+	/// Returns -1 if there is no next song to play.
+	int __fastcall NextIndexToPlay();
+
+	/// Returns the index of the previous song in the list to play.
+	/// Returns the last song in the list if the current song is the first one.
+	/// Returns -1 if there is no previous song to play.
+	int __fastcall PrevIndexToPlay();
+
+	/// Plays the currently loaded song in the media control and
+	/// updates the button accordingly. Use this instead of MediaControl->Play().
+	void __fastcall Play();
+
+	/// Loads the specified file to the MediaControl.
+	/// Loads the playlist if applicable.
+	void __fastcall LoadSong(String path);
+
+	/// Plays the next song in the now playing list that is checked.
+	/// Will loop if the option is selected, otherwise does nothing.
+	void __fastcall PlayNextSong();
+
+	/// Plays the previous song in the now playing list that is checked.
+	/// Will loop if the option is selected, otherwise does nothing.
+	void __fastcall PlayPrevSong();
+
+	/// Parses the filename from the given path name.
+	String __fastcall ParseFile(String path);
+
+	/// Updates the track bar to match the current song's progress.
+	void __fastcall UpdateTrackBar();
+
+	/// Updates the state of the buttons.
+	void __fastcall UpdateButtonStates();
+
+	/// Returns, in string form, the standard time in minutes and
+	/// seconds based on the number of milliseconds.
+	String __fastcall GetTime(int msec);
+
+	/// Returns whether or not the specified file path has already
+	/// been loaded.
+	bool __fastcall AlreadyLoaded(String path);
+
+	/// Loads the specified song path into the library if it has not
+	/// already been loaded. Returns the index the path wss added to (in m_allFiles).
+	/// Returns -1 if the song was not successfully added.
+	int __fastcall AddFileToLibrary(String path);
+
+	/// Adds the specified song path into the play list. Does not add the
+	/// song to the library. Returns the index the song was added to.
+	int __fastcall AddFileToPlayList(String path);
+
+	/// Adds the specified path to the favorites list if it is not
+	/// already there. Returns the index the path wss added to (in m_favList).
+	/// Returns -1 if the song was not successfully added.
+	int __fastcall AddFileToFavorites(String path);
+
+	/// Returns a randomly selected index of a checked song
+	/// in the now playing list.
+	unsigned int __fastcall RandomEnabledIndex();
+
+	/// Reads the favorites file and updates the m_favList variable.
+	/// Returns whether or not the file was succesfully read.
+	bool __fastcall ReadFile(String path, std::vector<String>* list);
+
+	/// Writes to the specified file, updating it with the values in
+	/// the list variable. Returns whether or not the file was
+	/// succesfully written to.
+	bool __fastcall WriteFile(String path, std::vector<String> list);
+
+	/// Plays the song depending on the selected autoplay type.
+	/// Returns whether or not a song was played. startIndex is the
+	/// index of the first song in the "group" to play.
+	bool __fastcall TryAutoPlay(int startIndex);
+
+	/// Updates which item in the playlist is grayed (currently playing).
+	void __fastcall UpdateNowPlayingItem();
+
+public:		// User declarations
+	/// Constructor
+	__fastcall TZPlayerForm(TComponent* Owner);
+
+	/// Sets the background and text colors to the specified ones.
+	void __fastcall SetColorScheme(TColor bgColor, TColor txtColor);
+};
+//---------------------------------------------------------------------------
+extern PACKAGE TZPlayerForm *ZPlayerForm;
+//---------------------------------------------------------------------------
+#endif

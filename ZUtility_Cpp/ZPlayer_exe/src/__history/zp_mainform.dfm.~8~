@@ -1,0 +1,459 @@
+object ZPlayerForm: TZPlayerForm
+  Left = 540
+  Top = 263
+  BorderIcons = [biSystemMenu, biMinimize]
+  Caption = 'ZPlayer'
+  ClientHeight = 288
+  ClientWidth = 295
+  Color = clBlack
+  Constraints.MaxHeight = 344
+  Constraints.MaxWidth = 311
+  Constraints.MinHeight = 340
+  Constraints.MinWidth = 309
+  Font.Charset = DEFAULT_CHARSET
+  Font.Color = clWindowText
+  Font.Height = -11
+  Font.Name = 'Tahoma'
+  Font.Style = []
+  Menu = MainFormMenu
+  OldCreateOrder = False
+  Position = poScreenCenter
+  OnClose = FormClose
+  OnCreate = FormCreate
+  OnDestroy = FormDestroy
+  DesignSize = (
+    295
+    288)
+  PixelsPerInch = 96
+  TextHeight = 13
+  object PlayingLabel: TLabel
+    Left = 8
+    Top = 16
+    Width = 134
+    Height = 18
+    Anchors = [akLeft, akTop, akRight]
+    Caption = 'Welcome to ZPlayer!'
+    Font.Charset = DEFAULT_CHARSET
+    Font.Color = clWhite
+    Font.Height = -15
+    Font.Name = 'Tahoma'
+    Font.Style = []
+    ParentFont = False
+    ParentShowHint = False
+    ShowHint = True
+  end
+  object PlayingListLabel: TLabel
+    Left = 152
+    Top = 80
+    Width = 70
+    Height = 13
+    Anchors = [akTop, akRight, akBottom]
+    Caption = 'Now Playing...'
+    Font.Charset = DEFAULT_CHARSET
+    Font.Color = clWhite
+    Font.Height = -11
+    Font.Name = 'Tahoma'
+    Font.Style = []
+    ParentFont = False
+  end
+  object LibraryLabel: TLabel
+    Left = 9
+    Top = 80
+    Width = 45
+    Height = 13
+    Anchors = [akLeft, akTop, akBottom]
+    Caption = 'Library...'
+    Font.Charset = DEFAULT_CHARSET
+    Font.Color = clWhite
+    Font.Height = -11
+    Font.Name = 'Tahoma'
+    Font.Style = []
+    ParentFont = False
+  end
+  object TimeDisplay: TLabel
+    Left = 229
+    Top = 6
+    Width = 60
+    Height = 13
+    Caption = '00:00/00:00'
+    Font.Charset = DEFAULT_CHARSET
+    Font.Color = clWhite
+    Font.Height = -11
+    Font.Name = 'Tahoma'
+    Font.Style = []
+    ParentFont = False
+  end
+  object MediaControl: TMediaPlayer
+    Left = 8
+    Top = 55
+    Width = 281
+    Height = 25
+    ColoredButtons = []
+    EnabledButtons = [btPlay, btPause, btStop, btNext, btPrev]
+    VisibleButtons = [btPlay, btPause, btStop, btNext, btPrev]
+    Anchors = [akLeft, akTop, akRight, akBottom]
+    AutoEnable = False
+    Constraints.MinWidth = 281
+    TabOrder = 6
+    OnClick = MediaControlClick
+  end
+  object LibraryList: TListBox
+    Left = 9
+    Top = 97
+    Width = 138
+    Height = 161
+    Anchors = [akLeft, akTop, akBottom]
+    ItemHeight = 13
+    MultiSelect = True
+    ParentShowHint = False
+    PopupMenu = LibraryPopup
+    ShowHint = True
+    TabOrder = 0
+    OnDblClick = LibraryListDblClick
+    OnMouseMove = ListMouseMove
+  end
+  object PlayingList: TCheckListBox
+    Left = 151
+    Top = 97
+    Width = 138
+    Height = 161
+    Anchors = [akTop, akRight, akBottom]
+    ItemHeight = 13
+    ParentShowHint = False
+    PopupMenu = NowPlayingPopup
+    ShowHint = True
+    TabOrder = 1
+    OnDblClick = PlayingListDblClick
+    OnMouseMove = ListMouseMove
+  end
+  object SongTrackBar: TTrackBar
+    Left = 6
+    Top = 37
+    Width = 283
+    Height = 13
+    Anchors = [akLeft, akTop, akRight]
+    Enabled = False
+    TabOrder = 7
+    TabStop = False
+  end
+  object CropButton: TButton
+    Left = 153
+    Top = 263
+    Width = 46
+    Height = 19
+    Caption = 'Crop'
+    TabOrder = 3
+    OnClick = CropSelected1Click
+  end
+  object ClearButton: TButton
+    Left = 245
+    Top = 263
+    Width = 46
+    Height = 19
+    Caption = 'Clear'
+    TabOrder = 5
+    OnClick = ClearButtonClick
+  end
+  object DeleteButton: TButton
+    Left = 199
+    Top = 263
+    Width = 46
+    Height = 19
+    Caption = 'Delete'
+    TabOrder = 4
+    OnClick = RemoveSelected1Click
+  end
+  object SearchIn: TLabeledEdit
+    Left = 43
+    Top = 262
+    Width = 105
+    Height = 21
+    EditLabel.Width = 33
+    EditLabel.Height = 13
+    EditLabel.Caption = 'Search'
+    EditLabel.Font.Charset = DEFAULT_CHARSET
+    EditLabel.Font.Color = clWhite
+    EditLabel.Font.Height = -11
+    EditLabel.Font.Name = 'Tahoma'
+    EditLabel.Font.Style = []
+    EditLabel.ParentFont = False
+    LabelPosition = lpLeft
+    TabOrder = 2
+    OnChange = SearchInChange
+  end
+  object MainFormMenu: TMainMenu
+    Left = 64
+    Top = 65528
+    object File1: TMenuItem
+      Caption = 'Load'
+      Hint = 'Ctrl+O'
+      ShortCut = 16463
+      OnClick = File1Click
+    end
+    object Options1: TMenuItem
+      Caption = 'Options'
+      Hint = 'Ctrl+P'
+      ShortCut = 16464
+      OnClick = Options1Click
+    end
+    object About1: TMenuItem
+      Caption = 'Help'
+      Enabled = False
+      ShortCut = 112
+    end
+    object Close1: TMenuItem
+      Caption = 'Close'
+      Hint = 'Ctrl+W'
+      ShortCut = 16471
+      OnClick = Close1Click
+    end
+  end
+  object NowPlayingPopup: TPopupMenu
+    Left = 208
+    Top = 136
+    object Add1: TMenuItem
+      Caption = 'Add...'
+      ShortCut = 16449
+      OnClick = Add1Click
+    end
+    object PlaySelected1: TMenuItem
+      Caption = 'Play Selected'
+      ShortCut = 13
+    end
+    object CropSelected1: TMenuItem
+      Caption = 'Crop Selected'
+      ShortCut = 8205
+      OnClick = CropSelected1Click
+    end
+    object Remove1: TMenuItem
+      Caption = 'Remove...'
+      object RemoveSelected1: TMenuItem
+        Caption = 'Selected'
+        ShortCut = 46
+        OnClick = RemoveSelected1Click
+      end
+      object NewPlayingList1: TMenuItem
+        Caption = 'All'
+        ShortCut = 24622
+        OnClick = ClearButtonClick
+      end
+    end
+    object Move1: TMenuItem
+      Caption = 'Move Selected...'
+      object Up1: TMenuItem
+        Caption = 'Up'
+        ShortCut = 16422
+        OnClick = MoveUp1Click
+      end
+      object Down1: TMenuItem
+        Caption = 'Down'
+        ShortCut = 16424
+        OnClick = MoveDown1Click
+      end
+      object ToTop1: TMenuItem
+        Caption = 'To Top'
+        ShortCut = 24614
+        OnClick = MoveToTop1Click
+      end
+      object ToBottom1: TMenuItem
+        Caption = 'To Bottom'
+        ShortCut = 24616
+        OnClick = MoveToBottom1Click
+      end
+    end
+    object SaveNowPlayingList1: TMenuItem
+      Caption = 'Save Now Playing List'
+      Enabled = False
+      ShortCut = 16467
+    end
+    object AddFavoritePlayList: TMenuItem
+      Caption = 'Add Selected as Favorite'
+      ShortCut = 16452
+      OnClick = AddFavoriteClick
+    end
+    object InvertSelected1: TMenuItem
+      Caption = 'Invert Selected'
+      OnClick = InvertSelected1Click
+    end
+  end
+  object OpenDialog1: TOpenDialog
+    DefaultExt = '*.MP3; *.MID; *.AVI; ; *.WMV'
+    Filter = 
+      'All Media Files|*.MP3; *.MID; *.AVI; *.WMV; *.WAV; *.AU; *.ZPL|A' +
+      'll Music Files (*.mp3, *.mid)|*.MP3; *.MID|All Video Files (*.av' +
+      'i, *.wmv)|*.AVI; *.WMV|MP3 Files (*.mp3)|*.MP3|Midi Files (*.mid' +
+      ')|*.MID|AVI Files (*.avi)|*.AVI|WMV Files (*.wmv)|*.WMV|ZPlaylis' +
+      't Files (*.zpl)|*.ZPL|All Files (*.*)|*.*'
+    Options = [ofHideReadOnly, ofAllowMultiSelect, ofEnableSizing]
+    Title = 'Open...'
+    Left = 32
+    Top = 65528
+  end
+  object SaveDialog1: TSaveDialog
+    Top = 65528
+  end
+  object PlayTimer: TTimer
+    OnTimer = PlayTimerTimer
+    Left = 96
+    Top = 65528
+  end
+  object LibraryPopup: TPopupMenu
+    Left = 24
+    Top = 136
+    object Load1: TMenuItem
+      Caption = 'Load'
+      ShortCut = 16463
+      OnClick = File1Click
+    end
+    object AddSelected1: TMenuItem
+      Caption = 'Add Selected to Current'
+      ShortCut = 13
+      OnClick = LibraryListDblClick
+    end
+    object AddSelected2: TMenuItem
+      Caption = 'Add Selected to New'
+      ShortCut = 8205
+      OnClick = AddSelected2Click
+    end
+    object DeleteSelected1: TMenuItem
+      Caption = 'Remove Selected'
+      ShortCut = 46
+      OnClick = DeleteSelected1Click
+    end
+    object AddFavoriteLibrary: TMenuItem
+      Caption = 'Add Selected as Favorite'
+      ShortCut = 16452
+      OnClick = AddFavoriteClick
+    end
+  end
+  object ActionList: TActionList
+    Left = 128
+    Top = 65528
+    object PlayPauseAction: TAction
+      Category = 'Play'
+      Caption = 'PlayPauseAction'
+      ShortCut = 117
+      OnExecute = PlayPauseActionExecute
+    end
+    object StopAction: TAction
+      Category = 'Play'
+      Caption = 'StopAction'
+      ShortCut = 118
+      OnExecute = StopActionExecute
+    end
+    object NextAction: TAction
+      Category = 'Play'
+      Caption = 'NextAction'
+      ShortCut = 119
+      OnExecute = NextActionExecute
+    end
+    object PrevAction: TAction
+      Category = 'Play'
+      Caption = 'PrevAction'
+      ShortCut = 116
+      OnExecute = PrevActionExecute
+    end
+    object QuickPlayAction1: TAction
+      Category = 'QuickPlay'
+      Caption = 'QuickPlayAction1'
+      ShortCut = 16433
+      OnExecute = QuickPlayActionExecute
+    end
+    object QuickPlayAction2: TAction
+      Category = 'QuickPlay'
+      Caption = 'QuickPlayAction2'
+      ShortCut = 16434
+      OnExecute = QuickPlayActionExecute
+    end
+    object QuickPlayAction3: TAction
+      Category = 'QuickPlay'
+      Caption = 'QuickPlayAction3'
+      ShortCut = 16435
+      OnExecute = QuickPlayActionExecute
+    end
+    object QuickPlayAction4: TAction
+      Category = 'QuickPlay'
+      Caption = 'QuickPlayAction4'
+      ShortCut = 16436
+      OnExecute = QuickPlayActionExecute
+    end
+    object QuickPlayAction5: TAction
+      Category = 'QuickPlay'
+      Caption = 'QuickPlayAction5'
+      ShortCut = 16437
+      OnExecute = QuickPlayActionExecute
+    end
+    object QuickPlayAction6: TAction
+      Category = 'QuickPlay'
+      Caption = 'QuickPlayAction6'
+      ShortCut = 16438
+      OnExecute = QuickPlayActionExecute
+    end
+    object QuickPlayAction7: TAction
+      Category = 'QuickPlay'
+      Caption = 'QuickPlayAction7'
+      ShortCut = 16439
+      OnExecute = QuickPlayActionExecute
+    end
+    object QuickPlayAction8: TAction
+      Category = 'QuickPlay'
+      Caption = 'QuickPlayAction8'
+      ShortCut = 16440
+      OnExecute = QuickPlayActionExecute
+    end
+    object QuickPlayAction9: TAction
+      Category = 'QuickPlay'
+      Caption = 'QuickPlayAction9'
+      ShortCut = 16441
+      OnExecute = QuickPlayActionExecute
+    end
+    object QuickPlayAction10: TAction
+      Category = 'QuickPlay'
+      Caption = 'QuickPlayAction10'
+      ShortCut = 16432
+      OnExecute = QuickPlayActionExecute
+    end
+    object LoopAction: TAction
+      Category = 'Options'
+      Caption = 'LoopAction'
+      ShortCut = 32844
+      OnExecute = LoopActionExecute
+    end
+    object ShuffleAction: TAction
+      Category = 'Options'
+      Caption = 'ShuffleAction'
+      ShortCut = 32851
+      OnExecute = ShuffleActionExecute
+    end
+    object HeadstartAction: TAction
+      Category = 'Options'
+      Caption = 'HeadstartAction'
+      ShortCut = 32836
+      OnExecute = HeadstartActionExecute
+    end
+    object HandicapAction: TAction
+      Category = 'Options'
+      Caption = 'HandicapAction'
+      ShortCut = 32835
+      OnExecute = HandicapActionExecute
+    end
+    object ReverseAction: TAction
+      Category = 'Options'
+      Caption = 'ReverseAction'
+      ShortCut = 32850
+      OnExecute = ReverseActionExecute
+    end
+    object AutoPlayAction: TAction
+      Category = 'Options'
+      Caption = 'AutoPlayAction'
+      ShortCut = 32833
+      OnExecute = AutoPlayActionExecute
+    end
+    object OnTopAction: TAction
+      Category = 'Options'
+      Caption = 'OnTopAction'
+      ShortCut = 32852
+      OnExecute = OnTopActionExecute
+    end
+  end
+end

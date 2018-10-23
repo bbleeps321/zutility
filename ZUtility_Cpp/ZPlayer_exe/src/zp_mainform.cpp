@@ -1,0 +1,1053 @@
+//---------------------------------------------------------------------------
+
+#include <vcl.h>
+#pragma hdrstop
+
+#include "zp_mainform.h"
+#include "xpl_xvector.h"
+#include "xpl_xstring.h"
+
+#include <iostream>
+#include <fstream>
+//---------------------------------------------------------------------------
+#pragma package(smart_init)
+#pragma resource "*.dfm"
+//---------------------------------------------------------------------------
+TZPlayerForm *ZPlayerForm;
+const String FAV_FILE = "favorites.txt";
+const String DEFAULT_LABEL = "Welcome to ZPlayer!";
+const String DEFAULT_TIME = "00:00/00:00";
+const String ZPLAYLIST_EXT = ".zpl";
+const TButtonSet NO_BUTTONS = TButtonSet();
+const TButtonSet ALL_BUTTONS = TButtonSet() << Mplayer::btPrev << btPlay << btPause << btStop << Mplayer::btNext;
+//---------------------------------------------------------------------------
+using namespace std;
+//---------------------------------------------------------------------------
+/// Constructor
+__fastcall TZPlayerForm::TZPlayerForm(TComponent* Owner)
+	: TForm(Owner)
+{
+}
+//---------------------------------------------------------------------------
+/// Called when the form is created.
+/// Initializes some member variables for controls.
+void __fastcall TZPlayerForm::FormCreate(TObject *Sender)
+{
+	m_optionsControl = new TOptionForm(this);
+
+	m_playing = false;
+	m_loaded = false;
+	m_currentSong = -1;
+
+	UpdateButtonStates();
+
+	PlayingList->MultiSelect = true;
+
+	PlayingLabel->Caption = DEFAULT_LABEL;
+	PlayingLabel->Hint = PlayingLabel->Caption;
+	TimeDisplay->Caption = DEFAULT_TIME;
+
+	MediaControl->TimeFormat = tfHMS;
+
+	m_optionsControl->m_loop = true; 		// looping is enabled initially
+	m_optionsControl->m_autoPlay = TOptionForm::AP_FIRST; 	// looping is enabled initially
+
+	// read favorites file and load items to library.
+	if (ReadFile(FAV_FILE, &m_favList)) {
+		for (unsigned int i = 0; i < m_favList.size(); i++) {
+			AddFileToLibrary(m_favList[i]);
+		}
+		SearchIn->Text = "";  // reset search text.
+		SearchInChange(NULL); // display all loaded songs.
+	}
+}
+//---------------------------------------------------------------------------
+/// Called when this form is destroyed.
+/// Updates the favorites file.
+void __fastcall TZPlayerForm::FormDestroy(TObject *Sender)
+{
+//	WriteFile(FAV_FILE, m_favList); // update favorites file
+}
+//---------------------------------------------------------------------------
+/// Stops any songs that are playing.
+void __fastcall TZPlayerForm::FormClose(TObject *Sender, TCloseAction &Action)
+{
+	StopActionExecute(NULL);
+}
+//---------------------------------------------------------------------------
+/// Called when the close action command is invoked.
+/// Closes the ZPlayer form.
+void __fastcall TZPlayerForm::Close1Click(TObject *Sender)
+{
+	Close();
+}
+//---------------------------------------------------------------------------
+/// Called when the open action command is invoked.
+/// Loads the selected song(s) into the library list.
+void __fastcall TZPlayerForm::File1Click(TObject *Sender)
+{
+	if (OpenDialog1->Execute())
+	{
+		for (int i = 0; i < OpenDialog1->Files->Count; i++) // for each selected file
+		{
+			String file = OpenDialog1->Files->operator [](i);
+
+			// add file to library
+			AddFileToLibrary(file);
+		}
+		SearchIn->Text = "";  // reset search text.
+		SearchInChange(NULL); // display all loaded songs.
+	}
+}
+//---------------------------------------------------------------------------
+/// Called when an item in the library list is double clicked.
+/// Adds the selected item to the now playing list and plays it
+/// if it is the first to be added.
+void __fastcall TZPlayerForm::LibraryListDblClick(TObject *Sender)
+{
+	// catch error
+	if (LibraryList->SelCount <= 0) return;
+	
+	int count = 0; // count of number of songs added so far
+	for (int i = 0; i < LibraryList->Count; i++)
+	{
+		if (LibraryList->Selected[i]) {
+			// add the file to the play list
+			int index = AddFileToPlayList(m_libraryFiles[i]);
+
+			if (count == 0) { // first song added and autoplay enabled
+				TryAutoPlay(index);
+			}
+			count++;
+		}
+	}
+
+	UpdateButtonStates();
+}
+//---------------------------------------------------------------------------
+/// Called when the timer event is scheduled.
+/// Checks if the song is over and goes to the next one if it is.
+void __fastcall TZPlayerForm::PlayTimerTimer(TObject *Sender)
+{
+	if (m_loaded && m_playing) {
+		// update track bar
+		UpdateTrackBar();
+
+		// handle when end of song is reached
+		bool finished = (MediaControl->Position >= MediaControl->Length);
+		if (m_optionsControl->m_headstart) {	// head start enabled
+			int gap = m_optionsControl->m_hsgap * 1000; // convert to milliseconds
+			finished = (MediaControl->Position >= MediaControl->Length - gap);
+		}
+
+		if (finished) {
+			// order of playing depends on if reverse option is selected.
+			if (!m_optionsControl->m_reverse) PlayNextSong();
+			else PlayPrevSong();
+		}
+	}
+}
+//---------------------------------------------------------------------------
+/// Called when the options action command is invoked.
+/// Shows the options control.
+void __fastcall TZPlayerForm::Options1Click(TObject *Sender)
+{
+	m_optionsControl->ShowModalOptionForm(&m_favList, Color, PlayingLabel->Font->Color);
+	WriteFile(FAV_FILE, m_favList); // update favorites file
+}
+//---------------------------------------------------------------------------
+/// Called when an item in the now playing list is double clicked.
+/// Plays the song that was double clicked on.
+void __fastcall TZPlayerForm::PlayingListDblClick(TObject *Sender)
+{
+	// catch error
+	if (PlayingList->SelCount <= 0 || !m_loaded) return;
+
+	m_currentSong = PlayingList->ItemIndex;
+	MediaControl->Close();
+	LoadSong(m_playListFiles[m_currentSong]);
+	Play();
+}
+//---------------------------------------------------------------------------
+/// Called when the media control component's button is clicked.
+/// Handles changes that need to be made. Different depending on the
+/// button that was clicked.
+void __fastcall TZPlayerForm::MediaControlClick(TObject *Sender,
+	  TMPBtnType Button, bool &DoDefault)
+{
+	DoDefault = false; // don't do default action
+
+	// prevent error
+	if (!m_loaded) return;
+
+	switch (Button) {
+		case btPlay: {
+			Play(); // m_playing set inside function
+			break;
+		}
+		case btPause: {
+			m_playing = !m_playing;
+			MediaControl->Pause();
+			break;
+		}
+		case btStop: {
+			m_playing = false;
+			MediaControl->Stop();
+			break;
+		}
+		case Mplayer::btNext: {
+			// m_playing set inside function
+			// order of playing depends on if reverse option is selected.
+			if (!m_optionsControl->m_reverse) PlayNextSong();  // normal conditions
+			else PlayPrevSong();                               // reverse
+			break;
+		}
+		case Mplayer::btPrev: {
+			// m_playing set inside function
+			// order of playing depends on if reverse option is selected.
+			if (!m_optionsControl->m_reverse) PlayPrevSong();  // normal conditions
+			else PlayNextSong();                               // reverse
+			break;
+		}
+		default: break;
+	} // switch
+}
+//---------------------------------------------------------------------------
+/// Action for pausing/resuming the current song.
+void __fastcall TZPlayerForm::PlayPauseActionExecute(TObject *Sender)
+{
+	if (!m_loaded) return;
+
+	if (!m_playing) {
+		MediaControl->Play();
+		m_playing = true;
+	}
+	else {
+		MediaControl->Pause();
+		m_playing = false;
+	}
+}
+//---------------------------------------------------------------------------
+/// Action for stopping the current song.
+void __fastcall TZPlayerForm::StopActionExecute(TObject *Sender)
+{
+	if (!m_loaded) return;
+
+	m_playing = false;
+	MediaControl->Stop();
+	MediaControl->Position = 0; // restart
+	UpdateTrackBar();
+}
+//---------------------------------------------------------------------------
+/// Action for playing the next song.
+void __fastcall TZPlayerForm::NextActionExecute(TObject *Sender)
+{
+	if (!m_loaded) return;
+
+	// m_playing set inside function
+	// order of playing depends on if reverse option is selected.
+	if (!m_optionsControl->m_reverse) PlayNextSong();  // normal conditions
+	else PlayPrevSong();                               // reverse
+}
+//---------------------------------------------------------------------------
+/// Action for playing the previous song.
+void __fastcall TZPlayerForm::PrevActionExecute(TObject *Sender)
+{
+	if (!m_loaded) return;
+
+	// m_playing set inside function
+	// order of playing depends on if reverse option is selected.
+	if (!m_optionsControl->m_reverse) PlayPrevSong();  // normal conditions
+	else PlayNextSong();                               // reverse
+}
+//---------------------------------------------------------------------------
+/// Called when the remove selected action event is invoked.
+/// Removes the selected songs from the playlist.
+void __fastcall TZPlayerForm::RemoveSelected1Click(TObject *Sender)
+{
+	// catch error
+	if (PlayingList->SelCount <= 0) return;
+
+	// just clear it if everything is selected.
+	if (PlayingList->SelCount == PlayingList->Count) {
+		ClearButtonClick(Sender);
+		return;
+	}
+
+	for (int i = 0; i < PlayingList->Count; i++) {
+		if (!PlayingList->Selected[i]) continue; // skip this iteration if the object is not selected
+
+		// handle when currently playing/loaded song is removed.
+		if (i == m_currentSong) {
+			MediaControl->Stop();
+			MediaControl->Close();
+			m_playing = false;
+			m_currentSong = NextIndexToPlay();
+			if (m_currentSong == -1) { // no next song
+				m_loaded = false;
+				PlayingLabel->Caption = DEFAULT_LABEL;
+				PlayingLabel->Hint = PlayingLabel->Caption;
+			}
+			else {
+				LoadSong(m_playListFiles[m_currentSong]);
+				PlayingLabel->Caption = PlayingList->Items->operator [](m_currentSong);
+				PlayingLabel->Hint = PlayingLabel->Caption;
+			}
+		}
+
+		PlayingList->Items->Delete(i); // remove from playing list component
+
+		m_playListFiles.erase(m_playListFiles.begin() + i); // remove from vector
+
+
+		i--;
+	}
+
+	UpdateButtonStates();
+}
+//---------------------------------------------------------------------------
+/// Called when the clear action event is invoked.
+/// Removes all the songs from the playlist.
+void __fastcall TZPlayerForm::ClearButtonClick(TObject *Sender)
+{
+	// stop here if list is already empty
+	if (PlayingList->Count <= 0) return;
+	
+	// stop playing
+	MediaControl->Stop();
+	MediaControl->Close();
+	m_loaded = false;
+
+	// clear now playing list.
+	PlayingList->Clear();
+	m_playListFiles.clear();
+
+	m_currentSong = -1;
+	m_playing = false;
+
+	PlayingLabel->Caption = DEFAULT_LABEL;
+	PlayingLabel->Hint = PlayingLabel->Caption;
+	TimeDisplay->Caption = DEFAULT_TIME;
+	SongTrackBar->Position = 0;
+
+	UpdateButtonStates();
+}
+//---------------------------------------------------------------------------
+/// Called when the text in the search box is changed.
+/// Searches the songs in the library and changes the contents of the
+/// display based on their relationship to the delimiter.
+void __fastcall TZPlayerForm::SearchInChange(TObject *Sender)
+{
+	LibraryList->Clear();
+	m_libraryFiles.clear();
+	String delim = SearchIn->Text;
+
+	if (delim == "*") {	// should show all favorites
+		for (unsigned int i = 0; i < m_favList.size(); i++) {
+			LibraryList->Items->Append(ParseFile(m_favList[i]));
+			m_libraryFiles.push_back(m_favList[i]);
+		}
+	}
+	else {				// should search normally
+		for (unsigned int i = 0; i < m_allFiles.size(); i++) {
+			if (XString::Contains(m_allFiles[i], delim, true)) { // related if delimiter found in file name
+				// add to library list
+				LibraryList->Items->Append(ParseFile(m_allFiles[i]));
+				m_libraryFiles.push_back(m_allFiles[i]);
+			}
+		}
+	}
+}
+//---------------------------------------------------------------------------
+/// Removes all the songs from the playlist except the selected ones and plays
+/// the new song at the top of the list.
+void __fastcall TZPlayerForm::CropSelected1Click(TObject *Sender)
+{
+	// catch error
+	if (PlayingList->SelCount <= 0) return;
+	
+	// copy selected songs' paths to temporary vector.
+	vector<String> temp;
+	for (int i = 0; i < PlayingList->Count; i++) {
+		if (PlayingList->Selected[i]) {
+			temp.push_back(m_playListFiles[i]);
+		}
+	}
+	m_playListFiles = temp;
+
+	// clear entire playlist of items and add the selected ones
+	PlayingList->Clear();
+	for (unsigned int i = 0; i < m_playListFiles.size(); i++) {
+		AddFileToPlayList(m_playListFiles[i]);
+	}
+
+	// play song at first index
+	LoadSong(m_playListFiles[0]);
+	m_currentSong = 0;
+	Play();
+}
+//---------------------------------------------------------------------------
+/// Called when the add to new list action event is invoked.
+/// Adds the selected songs in the library to a new, empty play list.
+void __fastcall TZPlayerForm::AddSelected2Click(TObject *Sender)
+{
+	ClearButtonClick(NULL);
+	LibraryListDblClick(NULL);
+}
+//---------------------------------------------------------------------------
+/// Called when the add song action event is invoked.
+/// Loads the selected song(s) into the library and the now playing list.
+void __fastcall TZPlayerForm::Add1Click(TObject *Sender)
+{
+	if (OpenDialog1->Execute()) {
+		for (int i = 0; i < OpenDialog1->Files->Count; i++) // for each selected file
+		{
+			String file = OpenDialog1->Files->operator [](i);
+
+			// add file to library
+			AddFileToLibrary(file);
+
+			// add file to play list
+			int index = AddFileToPlayList(file);
+
+			// play it if it is the first song to be added and autoplay enabled
+			if (i == 0) {
+				TryAutoPlay(index);
+			}
+		}
+		SearchIn->Text = ""; // reset search text.
+		SearchInChange(NULL);
+	}
+
+	UpdateButtonStates();
+}
+//---------------------------------------------------------------------------
+/// Called when the delete from library action event is invoked.
+/// Removes the selected song(s) from the library.
+void __fastcall TZPlayerForm::DeleteSelected1Click(TObject *Sender)
+{
+	for (unsigned int i = 0; i < m_libraryFiles.size(); i++) {
+		// skip if item at this index is not selected.
+		if (!LibraryList->Selected[i]) continue;
+
+		// TODO: Use XVector::IndexOf here.
+		for (unsigned int j = 0; j < m_allFiles.size(); j++) {		// erase from full library file vector.
+			if (m_allFiles[j] == m_libraryFiles[i]) {
+				m_allFiles.erase(m_allFiles.begin() + j);
+				break;
+			}
+		}
+		LibraryList->Items->Delete(i); 						// erase from component.
+		m_libraryFiles.erase(m_libraryFiles.begin() + i);	// erase from current library file vector.
+		i--; // to keep from skipping every other element.
+	}
+}
+//---------------------------------------------------------------------------
+/// Adds the selected songs in the library/playlist to the favorites
+/// list. Library/playlist depends on the sender.
+void __fastcall TZPlayerForm::AddFavoriteClick(TObject *Sender)
+{
+	// add ones selected in library
+	if (Sender == AddFavoriteLibrary) {
+		for (int i = 0; i < LibraryList->Count; i++) {
+			if (LibraryList->Selected[i]) {
+				AddFileToFavorites(m_libraryFiles[i]);
+			}
+		}
+	}
+	// add ones selected in playlist
+	else if (Sender == AddFavoritePlayList) {
+		for (int i = 0; i < PlayingList->Count; i++) {
+			if (PlayingList->Selected[i]) {
+				AddFileToFavorites(m_playListFiles[i]);
+			}
+		}
+	}
+
+	WriteFile(FAV_FILE, m_favList); // update favorites file
+}
+//---------------------------------------------------------------------------
+/// Inverts the checked state of the selected items in the playlist.
+void __fastcall TZPlayerForm::InvertSelected1Click(TObject *Sender)
+{
+	for (int i = 0; i < PlayingList->Count; i++) {
+		if (PlayingList->Selected[i]) PlayingList->Checked[i] = !PlayingList->Checked[i];
+	}
+}
+//---------------------------------------------------------------------------
+/// Handles the quickplaying of the top ten favorites.
+/// Adds the corresponding favorite to the playlist and plays it
+/// if the autoplay option is selected.
+void __fastcall TZPlayerForm::QuickPlayActionExecute(TObject *Sender)
+{
+	TAction * action = dynamic_cast<TAction*>(Sender);
+	if (action == NULL) return; // return if there is a casting error
+
+	// find index corresponding to action
+	String namebase = "QuickPlayAction";
+	unsigned int index = 20;        // default to impossible value
+	for (unsigned int i = 0; i < 10; i++) {
+		if ((namebase + IntToStr(i+1)) == action->Name) {
+			index = i;
+			break;
+		}
+	}
+
+	// return if index still at impossible value
+	if (index == 20) return;
+
+	if (index < m_favList.size()) {         // add song if in bounds
+		int playListIndex = AddFileToPlayList(m_favList[index]);
+		if (m_optionsControl->m_autoPlay) { // autoplay enabled
+			LoadSong(m_favList[index]);
+			m_currentSong = playListIndex;
+			Play();
+		}
+	}
+}
+//---------------------------------------------------------------------------
+/// Displays the entire song name of the item under the mouse cursor.
+/// Does nothing if there is no item under the mouse cursor.
+void __fastcall TZPlayerForm::ListMouseMove(TObject *Sender,
+	  TShiftState Shift, int X, int Y)
+{
+	TPoint * pt = new TPoint(X,Y);
+	int index = -1;
+	if (Sender == LibraryList) {
+		index = LibraryList->ItemAtPos(*pt, true);
+		// return if not over an item.
+		if (index == -1) return;
+		LibraryList->Hint = m_libraryFiles[index];
+	}
+	else if (Sender == PlayingList) {
+		index = PlayingList->ItemAtPos(*pt, true);
+		// return if not over an item.
+		if (index == -1) return;
+		PlayingList->Hint = m_playListFiles[index];
+	}
+
+	delete pt;
+}
+//---------------------------------------------------------------------------
+/// Moves the selected items in the playlist up one index.
+void __fastcall TZPlayerForm::MoveUp1Click(TObject *Sender)
+{           
+	for (int i = 0; i < PlayingList->Count; i++) {
+		// skip this iteration if item is not selected.
+		if (!PlayingList->Selected[i]) continue;
+		// already at top, or item above is selected, too: skip this iteration
+		if (i == 0 || PlayingList->Selected[i-1]) continue;
+
+		// swap string at this index with the one above it.
+		bool checked = PlayingList->Checked[i];
+		String temp = m_playListFiles[i];
+		PlayingList->Items->Delete(i);
+		m_playListFiles.erase(m_playListFiles.begin() + i);
+		PlayingList->Items->Insert(i-1, ParseFile(temp));
+		PlayingList->Checked[i-1] = checked;
+		m_playListFiles.insert(m_playListFiles.begin() + i-1, temp);
+
+		// item just moved is the current song
+		if (i == m_currentSong) m_currentSong--;
+		// item just swapped (one above) is the current song
+		else if (i-1 == m_currentSong) m_currentSong++;
+
+		// keep this item selected
+		PlayingList->Selected[i-1] = true;
+	}
+	UpdateNowPlayingItem();
+}
+//---------------------------------------------------------------------------
+/// Moves the selected items in the playlist down one index.
+void __fastcall TZPlayerForm::MoveDown1Click(TObject *Sender)
+{
+	for (int i = PlayingList->Count - 1; i >= 0; i--) {
+		// skip this iteration if item is not selected.
+		if (!PlayingList->Selected[i]) continue;
+		// already at bottom, or item below is selected, too: skip this iteration
+		if (i == PlayingList->Count - 1 || PlayingList->Selected[i+1]) continue;
+
+		// swap string at this index with the one below it.
+		bool checked = PlayingList->Checked[i];
+		String temp = m_playListFiles[i];
+		PlayingList->Items->Delete(i);
+		m_playListFiles.erase(m_playListFiles.begin() + i);
+		PlayingList->Items->Insert(i+1, ParseFile(temp));
+		PlayingList->Checked[i+1] = checked;
+		m_playListFiles.insert(m_playListFiles.begin() + i+1, temp);
+
+		// item just moved is the current song
+		if (i == m_currentSong) m_currentSong++;
+		// item just swapped (one below) is the current song
+		else if (i+1 == m_currentSong) m_currentSong--;
+		
+		// keep this item selected
+		PlayingList->Selected[i+1] = true;
+	}
+	UpdateNowPlayingItem();
+}
+//---------------------------------------------------------------------------
+/// Moves the selected items in the playlist to the top of the list.
+void __fastcall TZPlayerForm::MoveToTop1Click(TObject *Sender)
+{
+	int count = 0; // count of number of switches so far.
+	for (int i = 0; i < PlayingList->Count; i++) {
+		// skip this iteration if item is not selected.
+		if (!PlayingList->Selected[i]) continue;
+
+		// insert to top plus the number of inserts already done
+		bool checked = PlayingList->Checked[i];
+		String temp = m_playListFiles[i];
+		PlayingList->Items->Delete(i);
+		m_playListFiles.erase(m_playListFiles.begin() + i);
+		PlayingList->Items->Insert(count, ParseFile(temp));
+		PlayingList->Checked[count] = checked;
+		m_playListFiles.insert(m_playListFiles.begin() + count, temp);
+
+		// item just moved is the current song
+		if (i == m_currentSong) m_currentSong = count;
+		// current song was shifted due to insertion
+		else if (count <= m_currentSong && m_currentSong < i) m_currentSong++;
+		
+		// keep this item selected
+		PlayingList->Selected[count] = true;
+
+		count++;	// increment
+	}
+	UpdateNowPlayingItem();
+}
+//---------------------------------------------------------------------------
+/// Moves the selected items in the playlist to the bottom of the list.
+void __fastcall TZPlayerForm::MoveToBottom1Click(TObject *Sender)
+{
+	int count = 0; // count of number of switches so far.
+	for (int i = PlayingList->Count - 1; i >= 0; i--) {
+		// skip this iteration if item is not selected.
+		if (!PlayingList->Selected[i]) continue;
+
+		// swap string at this index with the one below it.
+		bool checked = PlayingList->Checked[i];
+		String temp = m_playListFiles[i];
+		PlayingList->Items->Delete(i);
+		m_playListFiles.erase(m_playListFiles.begin() + i);
+		PlayingList->Items->Insert(PlayingList->Count - count, ParseFile(temp));
+		PlayingList->Checked[PlayingList->Count - (1+count)] = checked; // size increase by one
+		m_playListFiles.insert(m_playListFiles.begin() + (PlayingList->Count - (1+count)), temp);
+
+		// item just moved is the current song
+		if (i == m_currentSong) m_currentSong = PlayingList->Count - (1+count);
+		// current song was shifted due to insertion
+		else if (i < m_currentSong && m_currentSong <= PlayingList->Count - (1+count)) m_currentSong--;
+		
+		// keep this item selected
+		PlayingList->Selected[PlayingList->Count - (1 + count)] = true;
+
+		count++;	// increment
+	}
+	UpdateNowPlayingItem();
+}
+//---------------------------------------------------------------------------
+/// Toggles the loop enabled state in the options.
+void __fastcall TZPlayerForm::LoopActionExecute(TObject *Sender)
+{
+	m_optionsControl->m_loop = !m_optionsControl->m_loop;
+}
+//---------------------------------------------------------------------------
+/// Toggles the shuffle enabled state in the options.
+void __fastcall TZPlayerForm::ShuffleActionExecute(TObject *Sender)
+{
+	m_optionsControl->m_shuffle = !m_optionsControl->m_shuffle;
+}
+//---------------------------------------------------------------------------
+/// Toggles the headstart enabled state in the options.
+void __fastcall TZPlayerForm::HeadstartActionExecute(TObject *Sender)
+{
+	m_optionsControl->m_headstart = !m_optionsControl->m_headstart;
+}
+//---------------------------------------------------------------------------
+/// Toggles the handicap enabled state in the options.
+void __fastcall TZPlayerForm::HandicapActionExecute(TObject *Sender)
+{
+	m_optionsControl->m_handicap = !m_optionsControl->m_handicap;
+}
+//---------------------------------------------------------------------------
+/// Toggles the reverse enabled state in the options.
+void __fastcall TZPlayerForm::ReverseActionExecute(TObject *Sender)
+{
+	m_optionsControl->m_reverse = !m_optionsControl->m_reverse;
+}
+//---------------------------------------------------------------------------
+/// Selected the autoplay type next to this one (increments the index)
+/// in the options.
+void __fastcall TZPlayerForm::AutoPlayActionExecute(TObject *Sender)
+{
+	if (m_optionsControl->m_autoPlay == TOptionForm::AP_NONE) {
+		m_optionsControl->m_autoPlay = TOptionForm::AP_FIRST;
+	}
+	else if (m_optionsControl->m_autoPlay == TOptionForm::AP_FIRST) {
+		m_optionsControl->m_autoPlay = TOptionForm::AP_ALL;
+	}
+	else if (m_optionsControl->m_autoPlay == TOptionForm::AP_ALL) {
+		m_optionsControl->m_autoPlay = TOptionForm::AP_NONE;
+	}
+	else {
+		MessageDlg("Unknown auto play type!", mtWarning, TMsgDlgButtons() << mbOK, 0);
+	}
+}
+//---------------------------------------------------------------------------
+/// Toggles the always on top enabled state in the options.
+void __fastcall TZPlayerForm::OnTopActionExecute(TObject *Sender)
+{
+	if (FormStyle == fsNormal) FormStyle = fsStayOnTop;
+	else FormStyle = fsNormal;
+
+}
+//---------------------------------------------------------------------------
+/// Plays the currently loaded song in the media control and
+/// updates the button accordingly. Use this instead of MediaControl->Play().
+void __fastcall TZPlayerForm::Play()
+{
+	MediaControl->Open();
+	m_loaded = true;
+	if (m_optionsControl->m_handicap) {
+		int gap = m_optionsControl->m_hcgap * 1000; // convert to milliseconds
+		MediaControl->Position += gap;
+	}
+	MediaControl->Play();
+	m_playing = true;
+	PlayingLabel->Caption = ParseFile(MediaControl->FileName); // update label
+	PlayingLabel->Hint = PlayingLabel->Caption;
+
+	// highlight the currently playing song in the play list
+	UpdateNowPlayingItem();
+
+	UpdateButtonStates();
+}
+//---------------------------------------------------------------------------
+/// Plays the next song in the now playing list that is checked.
+/// Will loop if the option is selected, otherwise does nothing.
+void __fastcall TZPlayerForm::PlayNextSong()
+{
+	int next = NextIndexToPlay();
+	if (next == -1) return; // not found
+
+	String song = m_playListFiles[next];
+
+	LoadSong(song); // song to next one
+
+	// next song is in front
+	if (next <= m_currentSong) { // for looping conditions
+		// check if looping is enabled
+		if (m_optionsControl->m_loop) {
+			m_currentSong = next;
+			Play();
+		}
+		else {
+			m_playing = false;
+		}
+	}
+	else {                       // for normal conditions
+		m_currentSong = next;
+		Play();
+	}
+}
+//---------------------------------------------------------------------------
+/// Plays the previous song in the now playing list that is checked.
+/// Will loop if the option is selected, otherwise does nothing.
+void __fastcall TZPlayerForm::PlayPrevSong()
+{
+	int prev = PrevIndexToPlay();
+	if (prev == -1) return; // not found
+
+	String song = m_playListFiles[prev];
+
+	LoadSong(song); // song to next one
+
+	// previous song is in front
+	if (prev >= m_currentSong) { // for looping conditions
+		// check if looping is enabled
+		if (m_optionsControl->m_loop) {
+			m_currentSong = prev;
+			Play();
+		}
+		else {
+			m_playing = false;
+		}
+	}
+	else {                       // for normal conditions
+		m_currentSong = prev;
+		Play();
+	}
+}
+//---------------------------------------------------------------------------
+/// Parses the filename from the given path name.
+String __fastcall TZPlayerForm::ParseFile(String fullpath)
+{
+	string temp = fullpath.c_str();
+	// substring file name only (no upper directories)
+	int start = temp.rfind("\\") + 1;
+	int end = temp.length();
+	return String(temp.substr(start, end).c_str());
+}
+//---------------------------------------------------------------------------
+/// Updates the track bar to match the current song's progress.
+void __fastcall TZPlayerForm::UpdateTrackBar()
+{
+	if (!m_loaded) return;
+
+	// update track bar
+	SongTrackBar->Max = MediaControl->Length;
+	SongTrackBar->Position = MediaControl->Position;
+
+	// update time display
+	MediaControl->TimeFormat = tfHMS;
+	int t = MediaControl->Length;
+	TimeDisplay->Caption = GetTime(MediaControl->Position) + "/" + GetTime(t);
+
+}
+//---------------------------------------------------------------------------
+/// Updates the state of the buttons.
+void __fastcall TZPlayerForm::UpdateButtonStates()
+{
+	if (PlayingList->Count > 0 && m_loaded) { // something in playing list and something loaded
+		MediaControl->EnabledButtons = ALL_BUTTONS;  // all buttons enabled
+	}
+	else {
+		MediaControl->EnabledButtons = NO_BUTTONS;  // no buttons enabled
+	}
+}
+//---------------------------------------------------------------------------
+/// Returns the index of the next song in the list to play.
+/// Returns the first song in the list if the current song is the last one.
+/// Returns -1 if there is no next song to play.
+int __fastcall TZPlayerForm::NextIndexToPlay()
+{
+	// Check if shuffle is selected and implement it to randomly select
+	// the next song using a separate RandomSongIndex() method.
+	if (m_optionsControl->m_shuffle) {
+		return RandomEnabledIndex();
+	}
+	else {
+		int temp = m_currentSong; // use temporary variable
+
+		for (unsigned int i = 0; i < m_playListFiles.size(); i++) {
+			// increment current song index.
+			temp++;
+			// reset to zero if new index is out of bounds.
+			if (temp >= m_playListFiles.size()) temp = 0;
+
+			if (PlayingList->Checked[temp]) return temp;
+		}
+		// nothing found
+		return -1;
+	}
+}
+//---------------------------------------------------------------------------
+/// Returns the index of the previous song in the list to play.
+/// Returns the last song in the list if the current song is the first one.
+/// Returns -1 if there is no previous song to play.
+int __fastcall TZPlayerForm::PrevIndexToPlay()
+{
+    // Check if shuffle is selected and implement it to randomly select
+	// the next song using a separate RandomSongIndex() method.
+	if (m_optionsControl->m_shuffle) {
+		return RandomEnabledIndex();
+	}
+	else {
+		int temp = m_currentSong; // use temporary variable
+
+		for (unsigned int i = 0; i < m_playListFiles.size(); i++) {
+			// increment current song index.
+			temp--;
+			// reset to zero if new index is out of bounds.
+			if (temp < 0) temp = m_playListFiles.size() - 1;
+
+			if (PlayingList->Checked[temp]) return temp;
+		}
+		// nothing found
+		return -1;
+	}
+}
+//---------------------------------------------------------------------------
+/// Returns, in string form, the standard time in minutes and
+/// seconds based on the number of milliseconds.
+String __fastcall TZPlayerForm::GetTime(int msec)
+{
+	// TODO : Fix time issue with .mid files (and some mp3).
+	int totalSec = msec/1000;
+	int min = totalSec/60;
+	int sec = totalSec%60;
+
+	String minTerm = IntToStr(min);
+	String secTerm = IntToStr(sec);
+
+	// prefix terms with "0" if less than 10 (not two digits long)
+	if (min < 10) minTerm = "0" + minTerm;
+	if (sec < 10) secTerm = "0" + secTerm;
+
+	return minTerm + ":" + secTerm;
+}
+//---------------------------------------------------------------------------
+/// Returns whether or not the specified file path has already
+/// been loaded.
+bool __fastcall TZPlayerForm::AlreadyLoaded(String path)
+{
+	for (unsigned int i = 0; i < m_allFiles.size(); i++) {
+		if (m_allFiles[i] == path) return true;
+	}
+	return false;
+}
+//---------------------------------------------------------------------------
+/// Loads the specified song path into the library if it has not
+/// already been loaded. Returns whether or not the path was added.
+int __fastcall TZPlayerForm::AddFileToLibrary(String path)
+{
+	// return false if the path has already been loaded.
+	if (AlreadyLoaded(path)) return -1;
+
+	m_allFiles.push_back(path); // add path to vector
+	return m_allFiles.size() - 1;
+}
+//---------------------------------------------------------------------------
+/// Adds the specified song path into the play list. Does not add the
+/// song to the library.
+int __fastcall TZPlayerForm::AddFileToPlayList(String path)
+{
+	// add name of the file to the now playing list
+	PlayingList->Items->Append(ParseFile(path));
+	PlayingList->Checked[PlayingList->Count - 1] = true; // make recently added item checked.
+
+	// add element in m_playListFiles to correspond to full path name
+	m_playListFiles.push_back(path);
+	return m_playListFiles.size() - 1;
+}
+//---------------------------------------------------------------------------
+/// Adds the specified path to the favorites list if it is not
+/// already there. Returns whether or not the song was added.
+int __fastcall TZPlayerForm::AddFileToFavorites(String path)
+{
+	// return false if the path is already in the favorites list.
+	for (unsigned int i = 0; i < m_favList.size(); i++)
+		if (m_favList[i] == path) return -1;
+
+	m_favList.push_back(path); // add path to vector
+	return m_favList.size() - 1;
+}
+//---------------------------------------------------------------------------
+/// Returns a randomly selected index of a checked song
+/// in the now playing list.
+unsigned int __fastcall TZPlayerForm::RandomEnabledIndex()
+{
+	int index = System::Random(m_playListFiles.size());
+	while (!PlayingList->Checked[index])
+		index = System::Random(m_playListFiles.size());
+
+	return index;
+}
+//---------------------------------------------------------------------------
+/// Reads the favorites file and updates the m_favList variable.
+/// Returns whether or not the file was succesfully read.
+bool __fastcall TZPlayerForm::ReadFile(String path, vector<String>* list)
+{
+	list->clear(); // clear if not already so
+
+	string line;
+	ifstream in(path.c_str());
+
+	if (in.is_open()) {        						// if opened
+		while (!in.eof()) {                         // while not at end of file
+			getline(in, line);                      // add line to vector
+			if (line == "") continue;				// skip if line is empty
+			list->push_back(XString::ToAnsiString(line));
+		}
+		in.close();                                 // close stream
+		return true;
+	}
+
+	return false;
+}
+//---------------------------------------------------------------------------
+/// Writes to the favorites file, updating it with the values in
+/// the m_favList variable. Returns whether or not the file was
+/// succesfully written to.
+bool __fastcall TZPlayerForm::WriteFile(String path, vector<String> list)
+{
+	ofstream out;
+//	MessageDlg("out made!", mtWarning, TMsgDlgButtons() << mbOK, 0);
+	out.open(path.c_str(), ios::binary);
+	if (out.is_open()) {                                // if opened
+//		MessageDlg("opened!", mtWarning, TMsgDlgButtons() << mbOK, 0);
+		out.clear(0);                                   // clear file
+		for (unsigned int i = 0; i < list.size(); i++) {    // for each favorite
+			out << XString::ToStdString(list[i] + "\n");                 // add to file with return char at end
+		}
+		out.close();									// close stream
+		return true;
+	}
+	return false;
+}
+//---------------------------------------------------------------------------
+/// Loads the specified file to the MediaControl.
+/// Loads the playlist if applicable.
+void __fastcall TZPlayerForm::LoadSong(String path)
+{
+	// TODO: handle .zpl files
+
+	MediaControl->FileName = path;
+
+}
+//---------------------------------------------------------------------------
+/// Plays the song depending on the selected autoplay type.
+/// Returns whether or not a song was played. startIndex is the
+/// index of the first song in the "group" to play.
+bool __fastcall TZPlayerForm::TryAutoPlay(int startIndex)
+{
+	// do nothing if "none" is selected.
+	if (m_optionsControl->m_autoPlay == TOptionForm::AP_NONE) return false;
+	// play song only if it is the first in the list.
+	else if (m_optionsControl->m_autoPlay == TOptionForm::AP_FIRST) {
+		if (startIndex == 0) {
+			LoadSong(m_playListFiles[startIndex]);
+			m_currentSong = startIndex;
+			Play();
+			return true;
+		}
+		return false;
+	}
+	// play first song in group.
+	else if (m_optionsControl->m_autoPlay == TOptionForm::AP_ALL) {
+		LoadSong(m_libraryFiles[startIndex]);
+		m_currentSong = startIndex;
+		Play();
+		return true;
+	}
+	// unknown type.
+	else {
+		MessageDlg("Unknown auto play type!", mtWarning, TMsgDlgButtons() << mbOK, 0);
+		return false;
+	}
+}
+//---------------------------------------------------------------------------
+/// Sets the background and text colors to the specified ones.
+void __fastcall TZPlayerForm::SetColorScheme(TColor bgColor, TColor txtColor)
+{
+	Color = bgColor;
+
+	PlayingLabel->Font->Color = txtColor;
+	TimeDisplay->Font->Color = txtColor;
+	LibraryLabel->Font->Color = txtColor;
+	PlayingListLabel->Font->Color = txtColor;
+	SearchIn->EditLabel->Font->Color = txtColor;
+}
+//---------------------------------------------------------------------------
+/// Updates which item in the playlist is grayed (currently playing).
+void __fastcall TZPlayerForm::UpdateNowPlayingItem()
+{
+	for (int i = 0; i < PlayingList->Count; i++) {
+		PlayingList->ItemEnabled[i] = (i != m_currentSong);
+	}
+	PlayingList->Refresh();
+}
+//---------------------------------------------------------------------------
+
+
