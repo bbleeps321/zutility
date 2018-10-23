@@ -1,0 +1,84 @@
+﻿<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <ProjectGuid>{a64f7afa-6303-4f63-8ace-7c6b5744a662}</ProjectGuid>
+  </PropertyGroup>
+  <ItemGroup />
+  <ItemGroup>
+    <Projects Include="XPanded_lib\projects\BCB2007\XPandedLib.cbproj" />
+    <Projects Include="ZEditor_dll\projects\BCB2007\ZEditorDll.cbproj" />
+    <Projects Include="ZEditor_exe\projects\BCB2007\ZEditor.cbproj" />
+    <Projects Include="ZPlayer_dll\projects\BCB2007\ZPlayerDll.cbproj" />
+    <Projects Include="ZPlayer_exe\projects\BCB2007\ZPlayer.cbproj" />
+    <Projects Include="ZUtility_exe\projects\BCB2007\ZUtility.cbproj" />
+  </ItemGroup>
+  <ProjectExtensions>
+    <Borland.Personality>Default.Personality</Borland.Personality>
+    <Borland.ProjectType />
+    <BorlandProject>
+<BorlandProject xmlns=""><Default.Personality></Default.Personality></BorlandProject></BorlandProject>
+  </ProjectExtensions>
+  <Target Name="XPandedLib">
+    <MSBuild Projects="XPanded_lib\projects\BCB2007\XPandedLib.cbproj" Targets="" />
+  </Target>
+  <Target Name="XPandedLib:Clean">
+    <MSBuild Projects="XPanded_lib\projects\BCB2007\XPandedLib.cbproj" Targets="Clean" />
+  </Target>
+  <Target Name="XPandedLib:Make">
+    <MSBuild Projects="XPanded_lib\projects\BCB2007\XPandedLib.cbproj" Targets="Make" />
+  </Target>
+  <Target Name="ZPlayer">
+    <MSBuild Projects="ZPlayer_exe\projects\BCB2007\ZPlayer.cbproj" Targets="" />
+  </Target>
+  <Target Name="ZPlayer:Clean">
+    <MSBuild Projects="ZPlayer_exe\projects\BCB2007\ZPlayer.cbproj" Targets="Clean" />
+  </Target>
+  <Target Name="ZPlayer:Make">
+    <MSBuild Projects="ZPlayer_exe\projects\BCB2007\ZPlayer.cbproj" Targets="Make" />
+  </Target>
+  <Target Name="ZEditor">
+    <MSBuild Projects="ZEditor_exe\projects\BCB2007\ZEditor.cbproj" Targets="" />
+  </Target>
+  <Target Name="ZEditor:Clean">
+    <MSBuild Projects="ZEditor_exe\projects\BCB2007\ZEditor.cbproj" Targets="Clean" />
+  </Target>
+  <Target Name="ZEditor:Make">
+    <MSBuild Projects="ZEditor_exe\projects\BCB2007\ZEditor.cbproj" Targets="Make" />
+  </Target>
+  <Target Name="ZPlayerDll">
+    <MSBuild Projects="ZPlayer_dll\projects\BCB2007\ZPlayerDll.cbproj" Targets="" />
+  </Target>
+  <Target Name="ZPlayerDll:Clean">
+    <MSBuild Projects="ZPlayer_dll\projects\BCB2007\ZPlayerDll.cbproj" Targets="Clean" />
+  </Target>
+  <Target Name="ZPlayerDll:Make">
+    <MSBuild Projects="ZPlayer_dll\projects\BCB2007\ZPlayerDll.cbproj" Targets="Make" />
+  </Target>
+  <Target Name="ZEditorDll">
+    <MSBuild Projects="ZEditor_dll\projects\BCB2007\ZEditorDll.cbproj" Targets="" />
+  </Target>
+  <Target Name="ZEditorDll:Clean">
+    <MSBuild Projects="ZEditor_dll\projects\BCB2007\ZEditorDll.cbproj" Targets="Clean" />
+  </Target>
+  <Target Name="ZEditorDll:Make">
+    <MSBuild Projects="ZEditor_dll\projects\BCB2007\ZEditorDll.cbproj" Targets="Make" />
+  </Target>
+  <Target Name="ZUtility">
+    <MSBuild Projects="ZUtility_exe\projects\BCB2007\ZUtility.cbproj" Targets="" />
+  </Target>
+  <Target Name="ZUtility:Clean">
+    <MSBuild Projects="ZUtility_exe\projects\BCB2007\ZUtility.cbproj" Targets="Clean" />
+  </Target>
+  <Target Name="ZUtility:Make">
+    <MSBuild Projects="ZUtility_exe\projects\BCB2007\ZUtility.cbproj" Targets="Make" />
+  </Target>
+  <Target Name="Build">
+    <CallTarget Targets="XPandedLib;ZPlayer;ZEditor;ZPlayerDll;ZEditorDll;ZUtility" />
+  </Target>
+  <Target Name="Clean">
+    <CallTarget Targets="XPandedLib:Clean;ZPlayer:Clean;ZEditor:Clean;ZPlayerDll:Clean;ZEditorDll:Clean;ZUtility:Clean" />
+  </Target>
+  <Target Name="Make">
+    <CallTarget Targets="XPandedLib:Make;ZPlayer:Make;ZEditor:Make;ZPlayerDll:Make;ZEditorDll:Make;ZUtility:Make" />
+  </Target>
+  <Import Condition="Exists('$(MSBuildBinPath)\Borland.Group.Targets')" Project="$(MSBuildBinPath)\Borland.Group.Targets" />
+</Project>

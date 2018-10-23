@@ -1,0 +1,45 @@
+//---------------------------------------------------------------------------
+
+#ifndef MainUnitH
+#define MainUnitH
+//---------------------------------------------------------------------------
+#include <Classes.hpp>
+#include <Controls.hpp>
+#include <StdCtrls.hpp>
+#include <Forms.hpp>
+
+#include "ZPlayerDll.h"
+#include "AboutForm.h"
+#include <Menus.hpp>
+//---------------------------------------------------------------------------
+class TZUtilityForm : public TForm
+{
+__published:	// IDE-managed Components
+	TButton *ZPlayerButton;
+	TMainMenu *MainMenu;
+	TMenuItem *Run1;
+	TMenuItem *ZPlayer1;
+	TMenuItem *About1;
+	TMenuItem *ZEditor1;
+
+	/// Called when the run zplayer action command is invoked.
+	/// Displays the ZPlayer window.
+	void __fastcall ZPlayerButtonClick(TObject *Sender);
+
+	/// Called when the show about info action event is invoked.
+	/// Displays the About window.
+	void __fastcall About1Click(TObject *Sender);
+
+	/// Called when this form is first created.
+	/// Initializes global components.
+	void __fastcall FormCreate(TObject *Sender);
+private:	// User declarations
+	TAboutBox * AboutBox;
+public:		// User declarations
+	/// Constructor
+	__fastcall TZUtilityForm(TComponent* Owner);
+};
+//---------------------------------------------------------------------------
+extern PACKAGE TZUtilityForm *ZUtilityForm;
+//---------------------------------------------------------------------------
+#endif
