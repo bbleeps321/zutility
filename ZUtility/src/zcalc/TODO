@@ -1,0 +1,37 @@
+CURRENT:
+-options file/window
+--axes label on/off
+
+BUGS/MAJOR CHANGES:
+-select calc table cells w/keys?
+-make calculator store expr as values (for fraction)
+?-inputHandler-->input-actionmap
+-FunctionChart class
+-check valid window range values
+
+FEATURES:
+-to fraction
+-set colors of functions (XYItemRenderer)
+-preview w/zoom?
+-calc min/max/root/intercept
+*-autoinsert last answer w/ oper
+-copy&paste
+-data table
+-save/open files
+-Trace functions
+
+OPERATORS:
+-toRad
+-toDeg
+-round
+-rem
+-nCr
+-nPr
+-rand
+-randInt
+-toFrac
+->> (store)
+
+MAYBE:
+-formattedtextfield?
+
