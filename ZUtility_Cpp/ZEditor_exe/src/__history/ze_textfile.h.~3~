@@ -1,0 +1,21 @@
+//---------------------------------------------------------------------------
+
+#ifndef ze_textfileH
+#define ze_textfileH
+//---------------------------------------------------------------------------
+#include <ComCtrls.hpp>
+#include <iostream>
+//---------------------------------------------------------------------------
+namespace ze {
+class TextFile
+{
+public:
+	TRichEdit 		*m_textField;			// field for displaying and editing text file
+	std::string      m_fileName;			// full file and path of text file.
+
+	/// Constructor
+	__fastcall TextFile(TRichEdit *edit, const std::string& file);
+};
+}
+//---------------------------------------------------------------------------
+#endif

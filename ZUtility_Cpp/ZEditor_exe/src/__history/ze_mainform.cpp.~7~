@@ -1,0 +1,48 @@
+//---------------------------------------------------------------------------
+
+#include <vcl.h>
+#pragma hdrstop
+
+#include "ze_mainform.h"
+//---------------------------------------------------------------------------
+#pragma package(smart_init)
+#pragma resource "*.dfm"
+TZEditorForm *ZEditorForm;
+//---------------------------------------------------------------------------
+__fastcall TZEditorForm::TZEditorForm(TComponent* Owner)
+	: TForm(Owner)
+{
+}
+//---------------------------------------------------------------------------
+/// Initializes one text field when the form is first created.
+void __fastcall TZEditorForm::FormCreate(TObject *Sender)
+{
+	AddNewField();
+}
+//---------------------------------------------------------------------------
+/// Adds a new text field to the tabpanel.
+void __fastcall TZEditorForm::AddNewField()
+{
+	// get current number of tabs
+	int numberOfTabs = TabControl->PageCount;
+
+	TTabSheet * sheet = new TTabSheet(TabControl);
+	sheet->Caption = "File " + IntToStr(numberOfTabs + 1);
+	TabControl->ActivePage = sheet;							// make new sheet the active one
+	sheet->PageControl = TabControl;
+
+	// create a new text field under TabControl1
+	TRichEdit * edit = new TRichEdit(this);
+	edit->Parent = sheet; // really necessary?
+	edit->BorderStyle = bsNone;
+	edit->BevelOuter = Controls::bvNone;
+
+	// add the field to the vector of files
+	TextFile::TextFile * txtFile = new TextFile::TextFile(edit, "");
+	m_textFiles.push_back(txtFile);
+
+	// show only that field, and it's now the current one
+	m_currentField = numberOfTabs;
+}
+//---------------------------------------------------------------------------
+

@@ -1,0 +1,21 @@
+//---------------------------------------------------------------------------
+
+#ifndef ze_mainformH
+#define ze_mainformH
+//---------------------------------------------------------------------------
+#include <Classes.hpp>
+#include <Controls.hpp>
+#include <StdCtrls.hpp>
+#include <Forms.hpp>
+//---------------------------------------------------------------------------
+class TZEditorForm : public TForm
+{
+__published:	// IDE-managed Components
+private:	// User declarations
+public:		// User declarations
+	__fastcall TZEditorForm(TComponent* Owner);
+};
+//---------------------------------------------------------------------------
+extern PACKAGE TZEditorForm *ZEditorForm;
+//---------------------------------------------------------------------------
+#endif

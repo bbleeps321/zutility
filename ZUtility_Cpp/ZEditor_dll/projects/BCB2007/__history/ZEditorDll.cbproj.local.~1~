@@ -1,0 +1,13 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<BorlandProject>
+  <Transactions>
+    <Transaction>2007/09/17 18:58:57.326.cpp,C:\Users\Owner\Documents\RAD Studio\Projects\File1.cpp=C:\Users\Owner\Documents\ZUtility\ZEditor_dll\src\zeditordll.cpp</Transaction>
+    <Transaction>2007/09/17 18:59:07.346.cbproj,C:\Users\Owner\Documents\RAD Studio\Projects\Project1.cbproj=C:\Users\Owner\Documents\ZUtility\ZEditor_dll\projects\BCB2007\ZEditorDll.cbproj</Transaction>
+    <Transaction>2007/09/17 19:03:14.058.h,C:\Users\Owner\Documents\ZUtility\ZEditor_dll\projects\BCB2007\File1.h=C:\Users\Owner\Documents\ZUtility\dll_interfaces\ZEditorDll.h</Transaction>
+    <Transaction>2007/09/17 19:04:48.939.cpp,C:\Users\Owner\Documents\ZUtility\ZEditor_dll\projects\BCB2007\Unit1.cpp=C:\Users\Owner\Documents\ZUtility\ZEditor_dll\src\ze_mainform.cpp</Transaction>
+    <Transaction>2007/09/17 19:04:48.939.h,C:\Users\Owner\Documents\ZUtility\ZEditor_dll\projects\BCB2007\Unit1.h=C:\Users\Owner\Documents\ZUtility\ZEditor_dll\src\ze_mainform.h</Transaction>
+    <Transaction>2007/09/17 19:04:48.939.dfm,C:\Users\Owner\Documents\ZUtility\ZEditor_dll\projects\BCB2007\Unit1.dfm=C:\Users\Owner\Documents\ZUtility\ZEditor_dll\src\ze_mainform.dfm</Transaction>
+    <Transaction>2007/09/17 19:21:27.009.cpp,C:\Users\Owner\Documents\ZUtility\ZEditor_dll\projects\BCB2007\Unit1.cpp=C:\Users\Owner\Documents\ZUtility\ZEditor_dll\src\ze_textfile.cpp</Transaction>
+    <Transaction>2007/09/17 19:21:27.009.h,C:\Users\Owner\Documents\ZUtility\ZEditor_dll\projects\BCB2007\Unit1.h=C:\Users\Owner\Documents\ZUtility\ZEditor_dll\src\ze_textfile.h</Transaction>
+  </Transactions>
+</BorlandProject>

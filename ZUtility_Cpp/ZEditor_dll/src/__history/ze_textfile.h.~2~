@@ -1,0 +1,15 @@
+//---------------------------------------------------------------------------
+
+#ifndef ze_textfileH
+#define ze_textfileH
+//---------------------------------------------------------------------------
+#include <iostream>
+//---------------------------------------------------------------------------
+class TextFile
+{
+public:
+	TRichEdit 		*m_textField;			// field for displaying and editing text file
+	std::string      m_fileName;			// full file and path of text file.
+};
+//---------------------------------------------------------------------------
+#endif
