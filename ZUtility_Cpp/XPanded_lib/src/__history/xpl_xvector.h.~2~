@@ -1,0 +1,19 @@
+//---------------------------------------------------------------------------
+
+#ifndef xpl_xvectorH
+#define xpl_xvectorH
+
+#include <Classes.hpp>
+#include <vector>
+
+//---------------------------------------------------------------------------
+class XVector
+{
+public:
+	/// Returns the index of the element inside the vector.
+	/// Returns -1 if the element cannot be found in the vector.
+	static int IndexOf(std::vector<void*> vector, void* element);
+};
+
+//---------------------------------------------------------------------------
+#endif

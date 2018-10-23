@@ -1,0 +1,21 @@
+//---------------------------------------------------------------------------
+
+#ifndef xpl_xstringH
+#define xpl_xstringH
+
+#include <Classes.hpp>
+#include <string>
+#include <vector>
+
+//---------------------------------------------------------------------------
+class XString
+{
+public:
+	/// Splits the original string around the specified delimiter and puts the parts
+	/// in the given output vector. Returns whether or not the string was split.
+	static bool Split(std::string orig, std::string delim, std::vector<std::string>& output);
+	static bool Split(String orig, String delim, std::vector<String>& output);
+};
+
+//---------------------------------------------------------------------------
+#endif

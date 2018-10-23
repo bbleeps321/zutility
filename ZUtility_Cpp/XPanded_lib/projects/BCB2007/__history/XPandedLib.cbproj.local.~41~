@@ -1,0 +1,10 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<BorlandProject>
+	<Transactions>
+    <Transaction>2007/08/22 06:42:23.919.cpp,C:\Users\jszhang\Documents\RAD Studio\Projects\Unit1.cpp=D:\C++\ZUtility\XPanded_lib\src\xpl_xstring.cpp</Transaction>
+    <Transaction>2007/08/22 06:42:23.919.h,C:\Users\jszhang\Documents\RAD Studio\Projects\Unit1.h=D:\C++\ZUtility\XPanded_lib\src\xpl_xstring.h</Transaction>
+    <Transaction>2007/08/22 06:42:52.364.cbproj,C:\Users\jszhang\Documents\RAD Studio\Projects\Project1.cbproj=D:\C++\ZUtility\XPanded_lib\projects\BCB2007\XPandedLib.cbproj</Transaction>
+    <Transaction>2007/08/22 10:17:44.624.cpp,D:\C++\ZUtility\XPanded_lib\projects\BCB2007\Unit1.cpp=D:\C++\ZUtility\XPanded_lib\src\xpl_xvector.cpp</Transaction>
+    <Transaction>2007/08/22 10:17:44.624.h,D:\C++\ZUtility\XPanded_lib\projects\BCB2007\Unit1.h=D:\C++\ZUtility\XPanded_lib\src\xpl_xvector.h</Transaction>
+  </Transactions>
+</BorlandProject>

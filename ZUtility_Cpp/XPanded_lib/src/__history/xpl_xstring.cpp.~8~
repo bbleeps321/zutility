@@ -1,0 +1,72 @@
+//---------------------------------------------------------------------------
+
+
+#pragma hdrstop
+
+#include "xpl_xstring.h"
+
+//---------------------------------------------------------------------------
+using namespace std;
+
+/// Splits the original string around the specified delimiter and puts the parts
+/// in the given output vector. Returns whether or not the string was split.
+bool XString::Split(string orig, string delim, vector<string>& output)
+{
+	// TODO: make it work!
+	return false;
+}
+//---------------------------------------------------------------------------
+/// Splits the original string around the specified delimiter and puts the parts
+/// in the given output vector. Returns whether or not the string was split.
+bool XString::Split(String orig, String delim, vector<String>& output)
+{
+	// TODO: make it work! (just call other split method)
+	return false;
+
+}
+//---------------------------------------------------------------------------
+/// Returns whether or not the given string contains the specified delimiter.
+bool XString::Contains(string orig, string delim, bool ignoreCase)
+{
+	string whole = orig;
+	if (ignoreCase) {
+		whole = ToLowerCase(orig);
+	}
+	// found if delimiter's index not equal to "no position".
+	return whole.find(delim, 0) != string::npos;
+}
+//---------------------------------------------------------------------------
+/// Returns whether or not the given string contains the specified delimiter.
+bool XString::Contains(String orig, String delim, bool ignoreCase)
+{
+	return Contains(ToStdString(orig), ToStdString(delim), ignoreCase);
+}
+//---------------------------------------------------------------------------
+/// Returns the target string converted to lowercase letters.
+/// Does not change the target string.
+string XString::ToLowerCase(string target)
+{
+	return ToStdString(ToAnsiString(target).LowerCase());
+}
+//---------------------------------------------------------------------------
+/// Returns the target string converted to uppercase letters.
+/// Does not change the target string.
+string XString::ToUpperCase(string target)
+{
+	return ToStdString(ToAnsiString(target).UpperCase());
+}
+//---------------------------------------------------------------------------
+/// Converts the target std::string to an AnsiString and returns it.
+String XString::ToAnsiString(string target)
+{
+	return String(target.c_str());
+}
+//---------------------------------------------------------------------------
+/// Converts the target AnsiString to a std::string and returns it.
+string XString::ToStdString(String target)
+{
+	return string(target.c_str());
+}
+//---------------------------------------------------------------------------
+
+#pragma package(smart_init)

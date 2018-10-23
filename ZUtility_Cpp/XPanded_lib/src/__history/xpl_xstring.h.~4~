@@ -1,0 +1,35 @@
+//---------------------------------------------------------------------------
+
+#ifndef xpl_xstringH
+#define xpl_xstringH
+
+#include <Classes.hpp>
+#include <string>
+#include <vector>
+
+//---------------------------------------------------------------------------
+class XString
+{
+public:
+	/// Splits the original string around the specified delimiter and puts the parts
+	/// in the given output vector. Returns whether or not the string was split.
+	static bool Split(std::string orig, std::string delim, std::vector<std::string>& output);
+	static bool Split(String orig, String delim, std::vector<String>& output);
+
+	/// Returns whether or not the given string contains the specified delimiter.
+	static bool Contains(std::string orig, std::string delim, bool ignoreCase);
+	static bool Contains(String orig, String delim, bool ignoreCase);
+
+	/// Modifies the output string to be identical to the original string but
+	/// with all lowercase characters.
+	static void ToLowerCase(std::string orig, std::string output);
+	static void ToLowerCase(String orig, String output);
+
+	/// Modifies the output string to be identical to the original string but
+	/// with all uppercase characters.
+	static void ToUpperCase(std::string orig, std::string output);
+	static void ToUpperCase(String orig, String output);
+};
+
+//---------------------------------------------------------------------------
+#endif

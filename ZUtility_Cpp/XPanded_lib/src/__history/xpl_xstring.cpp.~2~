@@ -1,0 +1,26 @@
+//---------------------------------------------------------------------------
+
+
+#pragma hdrstop
+
+#include "xpl_xstring.h"
+
+//---------------------------------------------------------------------------
+using namespace std;
+
+/// Splits the original string around the specified delimiter and puts the parts
+/// in the given output vector. Returns whether or not the string was split.
+static bool XString::Split(std::string orig, std::string delim, std::vector<std::string>& output)
+{
+	return false;
+}
+//---------------------------------------------------------------------------
+/// Splits the original string around the specified delimiter and puts the parts
+/// in the given output vector. Returns whether or not the string was split.
+static bool XString::Split(String orig, String delim, std::vector<String>& output)
+{
+	return false;
+
+}
+//---------------------------------------------------------------------------
+#pragma package(smart_init)

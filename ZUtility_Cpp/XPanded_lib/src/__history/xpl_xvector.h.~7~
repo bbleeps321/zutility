@@ -1,0 +1,25 @@
+//---------------------------------------------------------------------------
+
+#ifndef xpl_xvectorH
+#define xpl_xvectorH
+
+#include <Classes.hpp>
+#include <vector>
+
+//---------------------------------------------------------------------------
+class XVector
+{
+public:
+	template <typename T>
+	
+	/// Returns the index of the element inside the vector.
+	/// Returns -1 if the element cannot be found in the vector.
+	static int IndexOf(const std::vector<T> vector, const T element);
+
+	/// Returns whether or not the given element is in the specified vector
+	/// using the == operator.
+	static bool Contains(const std::vector<T> vector, const T element);
+};
+
+//---------------------------------------------------------------------------
+#endif
